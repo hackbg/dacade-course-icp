@@ -49,11 +49,14 @@ Queries and Transactions.
 
 ## Usage:
 
+It's recommended to use the UI that is generated when you deploy the canister using the `dfx deploy` command.
+
 To post a message to a thread you need to have:
 
 1. A registration
 2. Created a forum
 3. Created a thread
+4. Post a message and pass the thread id to the `createMessage` method.
 
 ## Error Handling
 
