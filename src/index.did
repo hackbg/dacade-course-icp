@@ -7,7 +7,7 @@ service: () -> {
     getThread: (principal) -> (variant {Ok:record {id:principal; name:text; description:text; forumId:principal}; Err:text}) query;
     getThreadMessages: (principal) -> (variant {Ok:vec record {id:principal; content:text; userId:principal; imageUrl:text; timestamp:nat64; threadId:principal}; Err:text}) query;
     getThreads: () -> (vec record {principal; record {id:principal; name:text; description:text; forumId:principal}}) query;
-    getUser: (principal) -> (variant {Ok:text; Err:text}) query;
+    getUser: (principal) -> (variant {Ok:record {id:principal; name:text; role:variant {RegularUser; Admin}; avatar:text}; Err:text}) query;
     getUsers: () -> (vec record {principal; record {id:principal; name:text; role:variant {RegularUser; Admin}; avatar:text}}) query;
     register: (text, text) -> (variant {Ok:text; Err:text});
 }
