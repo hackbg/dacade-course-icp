@@ -4,6 +4,7 @@ service: () -> {
     createMessage: (text, text, principal) -> (variant {Ok:text; Err:text});
     createThread: (text, text, principal) -> (variant {Ok:text; Err:text});
     getForums: () -> (vec record {principal; record {id:principal; name:text; description:text}}) query;
+    getMessages: () -> (vec record {principal; record {id:principal; content:text; userId:principal; imageUrl:text; timestamp:nat64; threadId:principal}}) query;
     getThread: (principal) -> (variant {Ok:record {id:principal; name:text; description:text; forumId:principal}; Err:text}) query;
     getThreadMessages: (principal) -> (variant {Ok:vec record {id:principal; content:text; userId:principal; imageUrl:text; timestamp:nat64; threadId:principal}; Err:text}) query;
     getThreads: () -> (vec record {principal; record {id:principal; name:text; description:text; forumId:principal}}) query;

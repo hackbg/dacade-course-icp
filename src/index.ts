@@ -102,6 +102,10 @@ export default Canister({
         return Ok(user.Some);
     }),
 
+    getMessages: query([], Vec(Tuple(Principal, Message)), async () => {
+        return messages.items();
+    }),
+
     /*//////////////////////////////////////////////////////////////
                             Transactions
     //////////////////////////////////////////////////////////////*/
