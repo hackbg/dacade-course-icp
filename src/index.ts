@@ -103,8 +103,7 @@ export default Canister({
     }),
 
     getMessages: query([], Vec(Tuple(Principal, Message)), async () => {
-        const allMessages = messages.items();
-        return allMessages;
+        return messages.items();
     }),
 
     /*//////////////////////////////////////////////////////////////
