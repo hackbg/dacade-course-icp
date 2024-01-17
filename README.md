@@ -7,10 +7,10 @@
 This README provides an overview and usage guide for a forum application implemented using the azle framework for the Internet Computer. The application features functionality for creating and managing forums, threads, messages, and user profiles.
 Features
 
--   Forum Management: Create and list forums, each with a unique identifier, name, and description.
--   Thread Management: Create threads within forums and retrieve individual or all threads.
--   Message Posting: Post messages in threads, including content, timestamp, and image URLs.
--   User Profiles: Register users with avatars and roles (Regular User or Admin), and update user avatars.
+- Forum Management: Create and list forums, each with a unique identifier, name, and description.
+- Thread Management: Create threads within forums and retrieve individual or all threads.
+- Message Posting: Post messages in threads, including content, timestamp, and image URLs.
+- User Profiles: Register users with avatars and roles (Regular User or Admin), and update user avatars.
 
 ## Setup
 
@@ -32,20 +32,20 @@ Queries and Transactions.
 
 ### Queries
 
-`getForums()`: Retrieves a list of all forums.
-`getThreads()`: Retrieves a list of all threads.
-`getThread(threadId: Principal)`: Retrieves a specific thread by its ID.
-`getThreadMessages(threadId: Principal)`: Retrieves messages in a specific thread.
-`getUsers()`: Retrieves a list of all users.
-`getUser(userId: Principal)`: Retrieves a specific user by their ID.
+- `getForums()`: Retrieves a list of all forums.
+- `getThreads()`: Retrieves a list of all threads.
+- `getThread(threadId: Principal)`: Retrieves a specific thread by its ID.
+- `getThreadMessages(threadId: Principal)`: Retrieves messages in a specific thread.
+- `getUsers()`: Retrieves a list of all users.
+- `getUser(userId: Principal)`: Retrieves a specific user by their ID.
 
 ### Transactions
 
-`createForum(name: text, description: text)`: Creates a new forum.
-`createThread(name: text, description: text, forumId: Principal)`: Creates a new thread in a forum.
-`createMessage(content: text, imageUrl: text, threadId: Principal)`: Posts a new message in a thread.
-`register(name: text, avatar: text)`: Registers a new user.
-`changeAvatar(avatar: text)`: Updates the avatar for the current user.
+- `createForum(name: text, description: text)`: Creates a new forum.
+- `createThread(name: text, description: text, forumId: Principal)`: Creates a new thread in a forum.
+- `createMessage(content: text, imageUrl: text, threadId: Principal)`: Posts a new message in a thread.
+- `register(name: text, avatar: text)`: Registers a new user.
+- `changeAvatar(avatar: text)`: Updates the avatar for the current user.
 
 ## Usage:
 
