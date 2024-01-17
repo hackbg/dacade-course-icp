@@ -32,20 +32,20 @@ Queries and Transactions.
 
 ### Queries
 
-    `getForums()`: Retrieves a list of all forums.
-    `getThreads()`: Retrieves a list of all threads.
-    `getThread(threadId: Principal)`: Retrieves a specific thread by its ID.
-    `getThreadMessages(threadId: Principal)`: Retrieves messages in a specific thread.
-    `getUsers()`: Retrieves a list of all users.
-    `getUser(userId: Principal)`: Retrieves a specific user by their ID.
+`getForums()`: Retrieves a list of all forums.
+`getThreads()`: Retrieves a list of all threads.
+`getThread(threadId: Principal)`: Retrieves a specific thread by its ID.
+`getThreadMessages(threadId: Principal)`: Retrieves messages in a specific thread.
+`getUsers()`: Retrieves a list of all users.
+`getUser(userId: Principal)`: Retrieves a specific user by their ID.
 
 ### Transactions
 
-    `createForum(name: text, description: text)`: Creates a new forum.
-    `createThread(name: text, description: text, forumId: Principal)`: Creates a new thread in a forum.
-    `createMessage(content: text, imageUrl: text, threadId: Principal)`: Posts a new message in a thread.
-    `register(name: text, avatar: text)`: Registers a new user.
-    `changeAvatar(avatar: text)`: Updates the avatar for the current user.
+`createForum(name: text, description: text)`: Creates a new forum.
+`createThread(name: text, description: text, forumId: Principal)`: Creates a new thread in a forum.
+`createMessage(content: text, imageUrl: text, threadId: Principal)`: Posts a new message in a thread.
+`register(name: text, avatar: text)`: Registers a new user.
+`changeAvatar(avatar: text)`: Updates the avatar for the current user.
 
 ## Usage:
 
