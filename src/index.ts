@@ -111,48 +111,84 @@ export default Canister({
     //////////////////////////////////////////////////////////////*/
 
     createForum: update(
-        [text, text],
-        Result(text, text),
-        async (name, description) => {
-            try {
-                const id = generateId();
-                const forum = {
-                    id,
-                    name,
-                    description,
-                };
-                forums.insert(id, forum);
-                return Ok(`Forum created - ${id}`);
-            } catch (error) {
-                return Err("Error creating forum");
+    [text, text],
+    Result(text, text),
+    async (name, description) => {
+        try {
+            // Reentrancy guard
+            ic.stable.set<string>("creatingForum", "true");
+
+            const id = generateId();
+            const forum = {
+                id,
+                name,
+                description,
+            };
+
+            // Ensure forum with the same ID doesn't already exist
+            if (forums.containsKey(id)) {
+                return Err("Forum with the same ID already exists");
             }
+
+            forums.insert(id, forum);
+            return Ok(`Forum created - ${id}`);
+        } catch (error) {
+            // Log or handle the error appropriately
+            return Err("Error creating forum");
+        } finally {
+            // Remove reentrancy flag
+            ic.stable.set<string>("creatingForum", "false");
         }
-    ),
+    }
+),
 
     createThread: update(
-        [text, text, Principal],
-        Result(text, text),
-        async (name, description, forumId) => {
-            try {
-                const id = generateId();
-                const thread = {
-                    id,
-                    name,
-                    description,
-                    forumId,
-                };
-                threads.insert(id, thread);
-                return Ok(`Thread created - ${id.toString()}`);
-            } catch (error) {
-                return Err("Error creating thread");
-            }
-        }
-    ),
+    [text, text, Principal],
+    Result(text, text),
+    async (name, description, forumId) => {
+        try {
+            // Reentrancy guard
+            ic.stable.set<string>("creatingThread", "true");
 
+            const id = generateId();
+            const thread = {
+                id,
+                name,
+                description,
+                forumId,
+            };
+
+            // Ensure thread with the same ID doesn't already exist
+            if (threads.containsKey(id)) {
+                return Err("Thread with the same ID already exists");
+            }
+
+            // Ensure the specified forumId exists
+            if (!forums.containsKey(forumId)) {
+                return Err("Forum does not exist");
+            }
+
+            threads.insert(id, thread);
+            return Ok(`Thread created - ${id.toString()}`);
+        } catch (error) {
+            // Log or handle the error appropriately
+            return Err("Error creating thread");
+        } finally {
+            // Remove reentrancy flag
+            ic.stable.set<string>("creatingThread", "false");
+        }
+    }
+),
+
+    
     createMessage: update(
-        [text, text, Principal],
-        Result(text, text),
-        async (content, imageUrl, threadId) => {
+    [text, text, Principal],
+    Result(text, text),
+    async (content, imageUrl, threadId) => {
+        try {
+            // Reentrancy guard
+            ic.stable.set<string>("creatingMessage", "true");
+
             const message = {
                 id: generateId(),
                 content,
@@ -162,51 +198,70 @@ export default Canister({
                 threadId,
             };
 
+            // Validate image URL
             if (!imageUrl.startsWith("ipfs://")) {
-                return Err("Image url must start with ipfs://");
+                return Err("Image URL must start with ipfs://");
             }
 
-            try {
-                const threadMessages = messages.get(threadId);
-                if ("None" in threadMessages) {
-                    messages.insert(threadId, [message]);
-                } else {
-                    const messages = threadMessages.Some.push(message);
-                    messages.remove(threadId);
-                    messages.insert(threadId, messages);
-                }
-                return Ok("Message created");
-            } catch (error) {
-                return Err("Unexpected error");
+            // Ensure the specified threadId exists
+            if (!threads.containsKey(threadId)) {
+                return Err("Thread does not exist");
             }
+
+            // Retrieve or create messages in the thread
+            const threadMessages = messages.getOrElse(threadId, Vec<Message>());
+            threadMessages.push(message);
+            messages.insert(threadId, threadMessages);
+
+            return Ok("Message created");
+        } catch (error) {
+            // Log or handle the error appropriately
+            return Err("Unexpected error");
+        } finally {
+            // Remove reentrancy flag
+            ic.stable.set<string>("creatingMessage", "false");
         }
-    ),
+    }
+),
 
     register: update([text, text], Result(text, text), async (name, avatar) => {
-        // if user is first user, make admin
+    try {
+        // Reentrancy guard
+        ic.stable.set<string>("registeringUser", "true");
+
+        const callerId = ic.caller();
+
+        // Check if user already exists
+        if (users.containsKey(callerId)) {
+            return Err("User already exists");
+        }
+
+        // Create a new user
         const user: typeof User = {
-            id: ic.caller(),
+            id: callerId,
             name,
             avatar,
-            role: { RegularUser: null },
+            role: { RegularUser: null }, // Default role for new users
         };
 
+        // Check if the user is the first user (make admin)
         if (users.isEmpty()) {
             user.role = { Admin: null };
         }
 
-        // check if user already exists
-        if (users.containsKey(ic.caller())) {
-            return Err("User already exists");
-        }
+        // Insert the new user
+        users.insert(callerId, user);
 
-        try {
-            users.insert(ic.caller(), user);
-            return Ok(`User created - ${user.id.toString()}`);
-        } catch (error) {
-            return Err("Unexpected error");
-        }
-    }),
+        return Ok(`User created - ${user.id.toString()}`);
+    } catch (error) {
+        // Log or handle the error appropriately
+        return Err("Unexpected error");
+    } finally {
+        // Remove reentrancy flag
+        ic.stable.set<string>("registeringUser", "false");
+    }
+}),
+
 
     changeAvatar: update([text], Result(text, text), async (avatar) => {
         // check if user already exists
@@ -230,10 +285,10 @@ export default Canister({
     }),
 });
 
-function generateId(): Principal {
-    const randomBytes = new Array(29)
-        .fill(0)
-        .map((_) => Math.floor(Math.random() * 256));
 
-    return Principal.fromUint8Array(Uint8Array.from(randomBytes));
+function generateId(): Principal {
+    const randomBytes = new Uint8Array(29);
+    crypto.getRandomValues(randomBytes);
+
+    return Principal.fromUint8Array(randomBytes);
 }
